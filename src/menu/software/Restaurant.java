@@ -42,4 +42,31 @@ public class Restaurant extends Log_In{
 	public Menu getMenu() { return menu;}
 	
 	// Methods
+	public void addItem(Item item) {
+		if(item.getType().equals("Entree")) { menu.addEntree(item);}
+		else if(item.getType().equals("Side")) { menu.addSide(item);}
+		else if(item.getType().equals("Drink")) { menu.addDrink(item);}
+	}
+	
+	public Item getItem(Item item) {
+		if(item.getType().equals("Entree")) { 
+			for(Item i: menu.getEntrees()) {
+				if(i.getName().equals(item.getName())){return i;}
+			}
+		}
+		else if(item.getType().equals("Side")) { 			
+			for(Item i: menu.getSides()) {
+				if(i.getName().equals(item.getName())){return i;}
+			}
+		}
+		else if(item.getType().equals("Drink")) { 			
+			for(Item i: menu.getDrinks()) {
+				if(i.getName().equals(item.getName())){return i;}
+			}
+		}
+		
+		return null;
+	}
+	
+	
 }

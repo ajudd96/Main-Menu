@@ -7,7 +7,7 @@ public class Driver extends Log_In{
 
 	// Constructor
 	public Driver() {
-
+		this.vehicle = "unknown";
 	}
 	
 	public Driver(String name, String address, String email, 

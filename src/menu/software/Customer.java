@@ -1,14 +1,16 @@
 package menu.software;
 
-import java.io.Serializable;
+import java.io.*;
+import java.util.ArrayList;
 
 public class Customer extends Log_In implements Serializable{
 
 	// Fields
+	private ArrayList<Payment> payments;
 	
 	// Constructors
 	public Customer() {
-
+		this.payments = new ArrayList<Payment>();
 	}
 	
 	public Customer(String name, String address, 
@@ -31,7 +33,10 @@ public class Customer extends Log_In implements Serializable{
 	}
 	
 	// Getters/Setters
+	public ArrayList<Payment> getPayments(){ return payments;}
 	
 	// Methods
+	public void addPayment(Payment payment){ this.payments.add(payment);}
+	public void removePayment(Payment payment){ this.payments.remove(payment);}
 
 }

@@ -1,9 +1,9 @@
 package menu.software;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.ArrayList; 
 
-public class MainMenu {
+public class MainMenu implements Serializable {
 	
 	// Fields
 	public ArrayList<Customer> customers;
@@ -28,11 +28,20 @@ public class MainMenu {
 	}
 	
 	// Getters/Setters
-	public ArrayList<Customer> getCustomers(){ return customers;}
-	public ArrayList<Driver> getDrivers(){ return drivers;}
+	public ArrayList<Customer> getCustomers(){ return customers;}	
+	public ArrayList<Driver> getDrivers(){ return drivers;}	
 	public ArrayList<Restaurant> getRestaurants(){ return restaurants;}
-	
+
 	// Methods
+	public void addCustomer(Customer customer){ this.customers.add(customer);}
+	public void removeCustomer(Customer customer){ this.customers.remove(customer);}
+	
+	public void addDriver(Driver driver){ this.drivers.add(driver);}
+	public void removeDriver(Driver driver){ this.drivers.remove(driver);}
+	
+	public void addRestaurant(Restaurant restaurant){ this.restaurants.add(restaurant);}
+	public void removeRestaurant(Restaurant restaurant){ this.restaurants.remove(restaurant);}
+	
 	public boolean CheckExists(int personType, String email, String password) {
 
 		if(personType == 1) {
@@ -138,13 +147,13 @@ public class MainMenu {
 	public static MainMenu loadData() {
 		FileInputStream fileIn = null;
 		ObjectInputStream objIn = null;
-		MainMenu mainmenu = null;
+		MainMenu menu = null;
 			
 		try
 		{
 			fileIn = new FileInputStream("MainMenu.ser");
 			objIn = new ObjectInputStream(fileIn);
-			mainmenu = (MainMenu) objIn.readObject();
+			menu = (MainMenu) objIn.readObject();
 			objIn.close();
 			fileIn.close();
 		}
@@ -156,6 +165,6 @@ public class MainMenu {
 		{
 			e.printStackTrace();
 		}  
-		return mainmenu;
+		return menu;
 	}
 }

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import menu.software.*;
@@ -20,6 +21,7 @@ public class MainMenuGUI extends JFrame {
 	private JMenuBar restaurantMenu;
 	private JMenuItem load;
 	private JMenuItem account;
+	private JMenuItem logout;
 	private JMenuItem exit;
 	// Information
 	private JTextField name;
@@ -51,6 +53,16 @@ public class MainMenuGUI extends JFrame {
 	private JButton back;
 	// Account
 	private JButton edit;
+	// Food Menu
+	private JPanel itemAdd;
+	private JTextField itemName;
+	private JTextField itemType;
+	private JTextField itemDescription;
+	private JTextField itemPrep;
+	private JTextField itemPrice;
+	private JTextArea entrees;
+	private JTextArea sides;
+	private JTextArea drinks;
 	// Other
 	private MainMenu mainMenu;
 	private Customer customerUser;
@@ -60,6 +72,7 @@ public class MainMenuGUI extends JFrame {
 	private String missingField;
 	private int Frame;
 	private ArrayList<String> restaurantHours;
+	private Item newItem;
 	
 	// Constructor
 
@@ -79,8 +92,15 @@ public class MainMenuGUI extends JFrame {
 		setVisible(true);
 		
 		// Declarations
-		mainMenu = new MainMenu();
-			
+		MainMenu menu = MainMenu.loadData();
+		
+		if(menu != null) {
+			mainMenu = new MainMenu(menu);
+		}
+		else {
+			mainMenu = new MainMenu();
+		}
+		
 		customerUser = new Customer();
 		driverUser = new Driver();
 		restaurantUser = new Restaurant();
@@ -95,6 +115,7 @@ public class MainMenuGUI extends JFrame {
 		
 		// Inputs
 		setTextFields();
+		setTextArea();
 		
 		person = 0;
 		
@@ -169,10 +190,37 @@ public class MainMenuGUI extends JFrame {
 			friday.setEditable(true);
 			saturday.setEditable(true);
 			sunday.setEditable(true);
-		}		
-		
+		}	
+		else if(Frame == 7) {
+			itemName = new JTextField(15);
+			itemType = new JTextField(15);
+			itemDescription = new JTextField(15);
+			itemPrep = new JTextField(15);
+			itemPrice = new JTextField(15);
+			
+			itemName.setText("");
+			itemType.setText("");
+			itemDescription.setText("");
+			itemPrep.setText("");
+			itemPrice.setText("");
+		}
+	
 	}
 
+	private void setTextArea() { // Initially Set TextArea 
+		entrees = new JTextArea(50,50);
+		sides = new JTextArea(50,50);
+		drinks = new JTextArea(50,50);
+		
+		entrees.setEditable(false);
+		sides.setEditable(false);
+		drinks.setEditable(false);	
+		
+		PrintStream entreePrint = new PrintStream(new CustomStream(entrees));
+		PrintStream sidePrint = new PrintStream(new CustomStream(sides));
+		PrintStream drinkPrint = new PrintStream(new CustomStream(drinks));
+	}
+	
 	// Methods
 	public void LogingIn() { // Log In Screen 
 		setSize(500,230);
@@ -232,51 +280,10 @@ public class MainMenuGUI extends JFrame {
 	private void SignUp() { // Sign Up for Customer 
 		Frame = 1;
 		
-		if(person == 1) {
-			setSize(500,300);
-		}
-		
 		message.setText("Please Enter The Following Information:");
-		
-		getInfo.removeAll();
-		getInfo.validate();
-		
-		getInfo.add(new JLabel(""));
-		getInfo.add(new JLabel(""));
-		
-		getInfo.setLayout(new GridLayout(7,0));
-		
-		getInfo.add(new JLabel("Name:"));
-		getInfo.add(name, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Address:"));
-		getInfo.add(address, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Email:"));
-		getInfo.add(email, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Password:"));
-		getInfo.add(password, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Phone Number:"));
-		getInfo.add(phoneNumber, BorderLayout.CENTER);
-		
-		if(person == 2) {
-			setSize(500,300);
-			
-			getInfo.setLayout(new GridLayout(7,0));
-			
-			getInfo.add(new JLabel("Vehicle:"));
-			getInfo.add(vehicle);
-		}
-		
-		getInfo.setBorder(BorderFactory.createTitledBorder("Information"));
-		
 		add(message, BorderLayout.NORTH);
-		add(getInfo, BorderLayout.CENTER);
 		
-		if(person == 3) {
-			setSize(500,510);
-			
-			CreateHours();
-			add(hours);
-		}
+		setGetInfo();
 		
 		done = new JButton("Done");
 		done.addActionListener(new SignButtonListener());
@@ -293,7 +300,7 @@ public class MainMenuGUI extends JFrame {
 	}
 	
 	private void Account() { // Screen That Shows Account Information 
-		add(getInfo, BorderLayout.CENTER);
+		setGetInfo();
 		
 		if(person == 3) {add(hours);}
 		
@@ -321,27 +328,88 @@ public class MainMenuGUI extends JFrame {
 	}
 
 	private void Customer() { // Customer Screen
+		Frame = 4;
+		
 		CustomerMenu();
 		
+		title.setText("Welcome " + customerUser.getName());
+		add(title);
 		
 		setVisible(true);
 	}
 	
 	private void Driver() { // Driver Screen
+		Frame = 5;
+		
 		DriverMenu();
+		
+		title.setText("Welcome " + driverUser.getName());
+		add(title);
 		
 		setVisible(true);
 	}
 	
 	private void Restaurant() { // Restaurant Screen
+		Frame = 6;
+		
 		RestaurantMenu();
+		
+		title.setText("Welcome " + restaurantUser.getName());
+		add(title);
 		
 		setVisible(true);
 	}
 	
-	private void AddToMenu() { // Add item to menu 
-		title.setText("Add To Menu");
-		add(title);
+	private void AddToMenu() { // Add item to menu
+		Frame = 7;
+		
+		setSize(500,250);
+		itemAdd = new JPanel();
+		
+		setTextFields();
+		
+		itemAdd.setLayout(new GridLayout(5,0));
+		
+		itemAdd.add(new JLabel("Name:"));
+		itemAdd.add(itemName, BorderLayout.CENTER);
+		itemAdd.add(new JLabel("Type:"));
+		itemAdd.add(itemType, BorderLayout.CENTER);
+		itemAdd.add(new JLabel("Description:"));
+		itemAdd.add(itemDescription, BorderLayout.CENTER);
+		itemAdd.add(new JLabel("Prep Time:"));
+		itemAdd.add(itemPrep, BorderLayout.CENTER);
+		itemAdd.add(new JLabel("Price:"));
+		itemAdd.add(itemPrice, BorderLayout.CENTER);
+		
+		itemAdd.setBorder(BorderFactory.createTitledBorder("Add Item Info Below:"));
+		
+		done = new JButton("Done");
+		done.addActionListener(new MenuButtonListener());
+		
+		back = new JButton("Back");
+		back.addActionListener(new MenuButtonListener());
+		
+		buttons.add(done);
+		buttons.add(back);
+
+		add(itemAdd, BorderLayout.CENTER);
+		add(buttons, BorderLayout.SOUTH);
+		
+		setVisible(true);
+
+	}
+	
+	private void RestaurantFoodMenu() { // Restaurant Menu
+
+		
+		
+		//System.setOut(printOut);
+/*
+		JPanel window = new JPanel();
+		JScrollPane scroll = new JScrollPane(textArea);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		window.add(scroll);
+	*/
 	}
 	
 	// Menu Methods
@@ -355,6 +423,7 @@ public class MainMenuGUI extends JFrame {
 		account.addActionListener(new MenuListener());
 		
 		fileMenu.add(account);
+		fileMenu.add(logout);
 		fileMenu.add(exit);
 			
 		customerMenu.add(fileMenu);
@@ -372,6 +441,7 @@ public class MainMenuGUI extends JFrame {
 		account.addActionListener(new MenuListener());
 		
 		fileMenu.add(account);
+		fileMenu.add(logout);
 		fileMenu.add(exit);
 			
 		driverMenu.add(fileMenu);
@@ -389,12 +459,14 @@ public class MainMenuGUI extends JFrame {
 		account.addActionListener(new MenuListener());
 		
 		fileMenu.add(account);
+		fileMenu.add(logout);
 		fileMenu.add(exit);
 			
 		restaurantMenu.add(fileMenu);
 	
 		setJMenuBar(restaurantMenu);
 	}
+
 	
 	// Simple Methods
 	private void removeFrameItem(JComponent component) { // Removes Single Item From Frame 
@@ -409,7 +481,7 @@ public class MainMenuGUI extends JFrame {
 		panel.repaint();
 	}
 	
-	private boolean CheckFrame() { // Checks that All Fields Are Filled
+	private boolean CheckFrame() { // Checks that All Fields Are Filled 
 		boolean good = false;
 		
 		if(Frame == 0) {
@@ -470,7 +542,61 @@ public class MainMenuGUI extends JFrame {
 			}
 		}
 		
+		if(Frame == 7) {
+			if(itemName.getText().isEmpty()) {missingField = "Item Name";}
+			else if(itemType.getText().isEmpty()) {missingField = "Item Type";}
+			else if(itemDescription.getText().isEmpty()) {missingField = "Description";}
+			else if(itemPrep.getText().isEmpty()) {missingField = "Item Prep Time";}
+			else if(itemPrice.getText().isEmpty()) {missingField = "Item Price";}
+			
+		}
+		
 		return good;
+	}
+
+	private void setGetInfo() { // Sets GetInfo Panel 
+
+		if(person == 1) {
+			setSize(500,300);
+		}
+
+		getInfo.removeAll();
+		getInfo.validate();
+		
+		getInfo.add(new JLabel(""));
+		getInfo.add(new JLabel(""));
+		
+		getInfo.setLayout(new GridLayout(7,0));
+		
+		getInfo.add(new JLabel("Name:"));
+		getInfo.add(name, BorderLayout.CENTER);
+		getInfo.add(new JLabel("Address:"));
+		getInfo.add(address, BorderLayout.CENTER);
+		getInfo.add(new JLabel("Email:"));
+		getInfo.add(email, BorderLayout.CENTER);
+		getInfo.add(new JLabel("Password:"));
+		getInfo.add(password, BorderLayout.CENTER);
+		getInfo.add(new JLabel("Phone Number:"));
+		getInfo.add(phoneNumber, BorderLayout.CENTER);
+		
+		if(person == 2) {
+			setSize(500,300);
+			
+			getInfo.setLayout(new GridLayout(7,0));
+			
+			getInfo.add(new JLabel("Vehicle:"));
+			getInfo.add(vehicle);
+		}
+		
+		getInfo.setBorder(BorderFactory.createTitledBorder("Information"));
+		add(getInfo, BorderLayout.CENTER);
+		
+		if(person == 3) {
+			setSize(500,510);
+			
+			CreateHours();
+			add(hours);
+		}
 	}
 	
 	private void CreateHours() { // Create TextFields for Hours 
@@ -509,6 +635,41 @@ public class MainMenuGUI extends JFrame {
 		restaurantHours.add(sunday.getText());	
 	}
 	
+	private void setExistingInfo() { // Sets Fields For Existing Info 
+		
+		if(person == 1) {
+			name.setText(customerUser.getName());
+			address.setText(customerUser.getAddress());
+			email.setText(customerUser.getEmail());
+			password.setText(customerUser.getPassword());
+			phoneNumber.setText(customerUser.getNumber());
+		}
+		else if(person == 2) {
+			name.setText(driverUser.getName());
+			address.setText(driverUser.getAddress());
+			email.setText(driverUser.getEmail());
+			password.setText(driverUser.getPassword());
+			phoneNumber.setText(driverUser.getNumber());
+			
+			vehicle.setText(driverUser.getVehicle());
+		}
+		else if(person == 3) {
+			name.setText(restaurantUser.getName());
+			address.setText(restaurantUser.getAddress());
+			email.setText(restaurantUser.getEmail());
+			password.setText(restaurantUser.getPassword());
+			phoneNumber.setText(restaurantUser.getNumber());
+			
+			monday.setText(restaurantUser.getHours().get(0));
+			tuesday.setText(restaurantUser.getHours().get(1));
+			wednesday.setText(restaurantUser.getHours().get(2));
+			thursday.setText(restaurantUser.getHours().get(3));
+			friday.setText(restaurantUser.getHours().get(4));
+			saturday.setText(restaurantUser.getHours().get(5));
+			sunday.setText(restaurantUser.getHours().get(6));
+		}
+	}
+	
 	// Classes
  	private class TimerListener implements ActionListener{ // Initial Screen Timer 
 
@@ -519,6 +680,9 @@ public class MainMenuGUI extends JFrame {
 			// Menu
 			menu = new JMenuBar();
 			JMenu fileMenu = new JMenu("File");
+			
+			logout = new JMenuItem("Logout");
+			logout.addActionListener(new MenuListener());
 			
 			exit = new JMenuItem("Exit");
 			exit.addActionListener(new MenuListener());
@@ -579,14 +743,20 @@ public class MainMenuGUI extends JFrame {
 				if(source.equals(logIn)) {
 					if(person == 1) {
 						customerUser = new Customer(mainMenu.getCustomer(email.getText(), password.getText()));
+						setExistingInfo();
+						
 						Customer();
 					}
 					else if(person == 2) {
 						driverUser = new Driver(mainMenu.getDriver(email.getText(), password.getText()));
+						setExistingInfo();
+						
 						Driver();
 					}
 					else if(person == 3) {
 						restaurantUser = new Restaurant(mainMenu.getRestaurant(email.getText(), password.getText()));
+						setExistingInfo();
+						
 						Restaurant();
 					}
 				}
@@ -647,12 +817,15 @@ public class MainMenuGUI extends JFrame {
 								"Add To Menu", JOptionPane.YES_NO_OPTION);
 						
 						if(ok == JOptionPane.OK_OPTION) {
+							
 							AddToMenu();
 						}
 						else {
 							Restaurant();
 						}	
 					}
+					
+					MainMenu.saveData(mainMenu);
 				}
 				else if(source.equals(back)) {
 					person = 0;
@@ -709,10 +882,12 @@ public class MainMenuGUI extends JFrame {
 		}
 	}
 
-	private class MenuListener implements ActionListener { // Menus
+	private class MenuListener implements ActionListener { // Menus 
 		
 		public void actionPerformed(ActionEvent e) {
 			JMenuItem source = (JMenuItem)(e.getSource());
+			
+			removeFrameItem(title);
 			
 			if(source.equals(account)) {
 				Frame = 2;
@@ -720,9 +895,60 @@ public class MainMenuGUI extends JFrame {
 				setTextFields();
 				Account();
 			}
+			else if(source.equals(logout)) {
+				LogingIn();
+			}
 			else if(source.equals(exit)) {
+				MainMenu.saveData(mainMenu);
 				System.exit(0);
 			}
 		}
 	}
+
+	private class MenuButtonListener implements ActionListener { // Adding Item to Menu 
+		
+		public void actionPerformed(ActionEvent e) {
+			JButton source = (JButton)(e.getSource());
+			
+			if(!CheckFrame() && source.equals(done)) {
+				if(missingField.equals("Description")) {
+					int ok = JOptionPane.showConfirmDialog(null, "Are you sure you would not like to add a desciption?", 
+							"Add Item", JOptionPane.YES_NO_OPTION);
+					
+					if(ok == JOptionPane.OK_OPTION) {
+						removeFrameItem(message);
+						removeFrameItem(itemAdd);
+						removeFrameItem(buttons);
+								
+						removePanelItem(buttons, done);
+						removePanelItem(buttons, back);
+						
+						RestaurantFoodMenu();
+					}
+					
+				}
+				else {
+				JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
+						"Missing Info", JOptionPane.PLAIN_MESSAGE);
+				}
+			}
+			else {
+				removeFrameItem(message);
+				removeFrameItem(itemAdd);
+				removeFrameItem(buttons);
+						
+				removePanelItem(buttons, done);
+				removePanelItem(buttons, back);
+				
+				if(source.equals(done)) {
+					
+					RestaurantFoodMenu();
+				}
+				else if(source.equals(back)) {
+					RestaurantFoodMenu();
+				}
+			}
+		}
+	}
+
 }
