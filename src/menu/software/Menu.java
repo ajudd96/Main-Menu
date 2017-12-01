@@ -37,5 +37,53 @@ public class Menu implements Serializable{
 	
 	public void addDrink(Item item) { this.drinks.add(item);}
 	public void removeDrink(Item item) { this.drinks.remove(item);}
+	
+	public void printEntrees() {
+		for (Item item: entrees) {
+			System.out.printf("%s $%f.2 %s\n", item.getName(), item.getPrice(), item.getDescription());
+		}
+	}
+	
+	public void printSides() {
+		for (Item item: sides) {
+			System.out.printf("%s $%f.2 %s\n", item.getName(), item.getPrice(), item.getDescription());
+		}
+	}
+	
+	public void printDrinks() {
+		for (Item item: drinks) {
+			System.out.printf("%s $%f.2 %s\n", item.getName(), item.getPrice(), item.getDescription());
+		}
+	}
+	
+	public ArrayList<String> getEntreesList() {
+		ArrayList<String> entreeList = new ArrayList<String>();
+		
+		for (Item item: entrees) {
+			entreeList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+		}
+		
+		return entreeList;
+	}
+	
+	public ArrayList<String> getSidesList() {
+		ArrayList<String> sideList = new ArrayList<String>();
+		
+		for (Item item: sides) {
+			sideList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+		}
+		
+		return sideList;
+	}
+	
+	public ArrayList<String> getDrinksList() {
+		ArrayList<String> drinkList = new ArrayList<String>();
+		
+		for (Item item: drinks) {
+			drinkList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+		}
+		
+		return drinkList;
+	}
 
 }

@@ -1,9 +1,9 @@
 package menu.GUI;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
@@ -14,12 +14,13 @@ public class MainMenuGUI extends JFrame {
 	// Fields 
 	private JLabel title;
 	private JLabel message;
+	// Panels
+	private JPanel getInfo;
+	private JPanel personType;
+	private JPanel buttons;
+	private JPanel hours;
 	// Menus
-	private JMenuBar menu;
-	private JMenuBar customerMenu;
-	private JMenuBar driverMenu;
-	private JMenuBar restaurantMenu;
-	private JMenuItem load;
+	private JMenuBar Menu;
 	private JMenuItem account;
 	private JMenuItem logout;
 	private JMenuItem exit;
@@ -37,32 +38,31 @@ public class MainMenuGUI extends JFrame {
 	private JTextField friday;
 	private JTextField saturday;
 	private JTextField sunday;
-	// Log In
-	private JPanel getInfo;
-	private JPanel personType;
-	private JPanel buttons;
+	// Buttons
 	private JButton logIn;
 	private JButton signUp;
+	private JButton done;
+	private JButton back;
+	private JButton edit;
+	private JButton create;
+	private JButton addItem;
+	private JButton toMenu;
+	private JButton viewRestaurant;
+	// Log In
 	private JRadioButton customer;
 	private JRadioButton driver;
 	private JRadioButton restaurant;
 	private int person; // 1 = customer, 2 = driver, 3 = restaurant
-	// Sign Up
-	private JPanel hours;
-	private JButton done;
-	private JButton back;
-	// Account
-	private JButton edit;
 	// Food Menu
 	private JPanel itemAdd;
+	private JList entreeList;
+	private JList sideList;
+	private JList drinkList;
 	private JTextField itemName;
 	private JTextField itemType;
 	private JTextField itemDescription;
 	private JTextField itemPrep;
 	private JTextField itemPrice;
-	private JTextArea entrees;
-	private JTextArea sides;
-	private JTextArea drinks;
 	// Other
 	private MainMenu mainMenu;
 	private Customer customerUser;
@@ -73,6 +73,10 @@ public class MainMenuGUI extends JFrame {
 	private int Frame;
 	private ArrayList<String> restaurantHours;
 	private Item newItem;
+	private Order order;
+	private PrintStream print;
+	private JTextArea area;
+	private Payment payment;
 	
 	// Constructor
 
@@ -109,20 +113,29 @@ public class MainMenuGUI extends JFrame {
 		
 		//Timer
 		timer = new Timer(1000, new TimerListener());
-		
-		// Printing
-		message = new JLabel();
-		
+
 		// Inputs
 		setTextFields();
 		setTextArea();
+		// Buttons
+		setButtons();
+
+		// Others
+		print = new PrintStream(new CustomStream(area));
+		System.setOut(print);
+		
+		getInfo = new JPanel();
+		personType = new JPanel();
+		buttons = new JPanel();
+		
+		message = new JLabel();
 		
 		person = 0;
 		
 		timer.start();
 	}
 	
-	private void setTextFields() { // Initially Sets TextFields	
+	private void setTextFields() { // Initialize TextFields	
 		if(Frame == 0) {
 			// For Everyone
 			name = new JTextField(15);
@@ -207,18 +220,47 @@ public class MainMenuGUI extends JFrame {
 	
 	}
 
-	private void setTextArea() { // Initially Set TextArea 
-		entrees = new JTextArea(50,50);
-		sides = new JTextArea(50,50);
-		drinks = new JTextArea(50,50);
+	private void setTextArea() { // Initialize TextArea 
+
+	}
+	
+	private void setButtons() { // Initialize Buttons
 		
-		entrees.setEditable(false);
-		sides.setEditable(false);
-		drinks.setEditable(false);	
+		// Log In
+		logIn = new JButton("Log In");
+		logIn.addActionListener(new MenuButtonListener());
 		
-		PrintStream entreePrint = new PrintStream(new CustomStream(entrees));
-		PrintStream sidePrint = new PrintStream(new CustomStream(sides));
-		PrintStream drinkPrint = new PrintStream(new CustomStream(drinks));
+		// Sign Up 
+		signUp = new JButton("Sign Up");
+		signUp.addActionListener(new MenuButtonListener());
+		
+		// Done
+		done = new JButton("Done");
+		done.addActionListener(new MenuButtonListener());
+		
+		// Back
+		back = new JButton("Back");
+		back.addActionListener(new MenuButtonListener());
+		
+		// Edit
+		edit = new JButton("Edit");
+		edit.addActionListener(new MenuButtonListener());
+		
+		// To Food Menu
+		toMenu = new JButton("To Menu");
+		toMenu.addActionListener(new MenuButtonListener());
+		
+		// Create Order (by Customer)
+		create = new JButton("Create Order");
+		create.addActionListener(new MenuButtonListener());
+		
+		// Add Item to Menu (by Restaurant)
+		addItem = new JButton("AddItem");
+		addItem.addActionListener(new MenuButtonListener());
+		
+		// View Restaurants (by Customer)
+		viewRestaurant = new JButton("View Restaurants");
+		viewRestaurant.addActionListener(new MenuButtonListener());
 	}
 	
 	// Methods
@@ -238,23 +280,10 @@ public class MainMenuGUI extends JFrame {
 		customer.addActionListener(new PersonListener());
 		driver.addActionListener(new PersonListener());
 		restaurant.addActionListener(new PersonListener());
-		
-		logIn = new JButton("Log In");
-		signUp = new JButton("Sign Up");
-		
-		logIn.addActionListener(new LogButtonListener());
-		signUp.addActionListener(new LogButtonListener());
-		
-		getInfo = new JPanel();
-		personType = new JPanel();
-		buttons = new JPanel();
 
 		message.setText("Log In:");
 
-		getInfo.add(new JLabel("Email:"));
-		getInfo.add(email, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Password:"));
-		getInfo.add(password, BorderLayout.CENTER);
+		setGetInfo();
 		
 		getInfo.setBorder(BorderFactory.createEtchedBorder());
 		
@@ -285,12 +314,6 @@ public class MainMenuGUI extends JFrame {
 		
 		setGetInfo();
 		
-		done = new JButton("Done");
-		done.addActionListener(new SignButtonListener());
-		
-		back = new JButton("Back");
-		back.addActionListener(new SignButtonListener());
-		
 		buttons.add(done);
 		buttons.add(back);
 
@@ -304,22 +327,14 @@ public class MainMenuGUI extends JFrame {
 		
 		if(person == 3) {add(hours);}
 		
-		buttons.removeAll();
-		buttons.validate();
+		ClearPanel(buttons);
 		
 		if(Frame == 2) {
-			edit = new JButton("Edit");
-			edit.addActionListener(new AccountButtonListener());
 			buttons.add(edit);
-			
-			back = new JButton("Back");
-			back.addActionListener(new AccountButtonListener());
 			buttons.add(back);
 
 		}
 		else if(Frame == 3) {
-			done = new JButton("Done");
-			done.addActionListener(new AccountButtonListener());
 			buttons.add(done);
 		}
 
@@ -330,10 +345,13 @@ public class MainMenuGUI extends JFrame {
 	private void Customer() { // Customer Screen
 		Frame = 4;
 		
-		CustomerMenu();
+		Menu();
 		
 		title.setText("Welcome " + customerUser.getName());
 		add(title);
+		
+		buttons.add(viewRestaurant);
+		add(buttons);
 		
 		setVisible(true);
 	}
@@ -341,7 +359,7 @@ public class MainMenuGUI extends JFrame {
 	private void Driver() { // Driver Screen
 		Frame = 5;
 		
-		DriverMenu();
+		Menu();
 		
 		title.setText("Welcome " + driverUser.getName());
 		add(title);
@@ -352,15 +370,24 @@ public class MainMenuGUI extends JFrame {
 	private void Restaurant() { // Restaurant Screen
 		Frame = 6;
 		
-		RestaurantMenu();
+		Menu();
 		
 		title.setText("Welcome " + restaurantUser.getName());
 		add(title);
+
+		buttons.add(toMenu);
+		add(buttons, BorderLayout.CENTER);
 		
 		setVisible(true);
 	}
 	
-	private void AddToMenu() { // Add item to menu
+	private void RestaurantList() {	//	Restaurant Listing 
+		Frame = 10;
+		
+		
+	}
+	
+	private void AddToMenu() { // Add item to menu 
 		Frame = 7;
 		
 		setSize(500,250);
@@ -382,13 +409,7 @@ public class MainMenuGUI extends JFrame {
 		itemAdd.add(itemPrice, BorderLayout.CENTER);
 		
 		itemAdd.setBorder(BorderFactory.createTitledBorder("Add Item Info Below:"));
-		
-		done = new JButton("Done");
-		done.addActionListener(new MenuButtonListener());
-		
-		back = new JButton("Back");
-		back.addActionListener(new MenuButtonListener());
-		
+
 		buttons.add(done);
 		buttons.add(back);
 
@@ -399,88 +420,131 @@ public class MainMenuGUI extends JFrame {
 
 	}
 	
-	private void RestaurantFoodMenu() { // Restaurant Menu
+	private void RestaurantFoodMenu() { // Restaurant Menu 
+		Frame = 8;
+		title.setText("Menu for " + restaurantUser.getName());
+		add(title, BorderLayout.NORTH);
 
+		if(person == 1) {
+			message.setText("Please Select The Items You Would Like To Order.");
+			add(message, BorderLayout.NORTH);
+		}
+		/*
+		String[] entrees = new String[restaurantUser.getMenu().getEntreesList().size()];
+		restaurantUser.getMenu().getEntreesList().toArray(entrees);
 		
+		String[] sides = new String[restaurantUser.getMenu().getSidesList().size()];
+		restaurantUser.getMenu().getDrinksList().toArray(sides);
 		
-		//System.setOut(printOut);
-/*
-		JPanel window = new JPanel();
-		JScrollPane scroll = new JScrollPane(textArea);
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		window.add(scroll);
-	*/
-	}
-	
-	// Menu Methods
-	private void CustomerMenu() { // Menu bar for Customer 
-		customerMenu = new JMenuBar();
-     	
-		// File Menu
-		JMenu fileMenu = new JMenu("Customer");
+		String[] drinks = new String[restaurantUser.getMenu().getDrinksList().size()];
+		restaurantUser.getMenu().getDrinksList().toArray(drinks);
 		
-		account = new JMenuItem("Account");
-		account.addActionListener(new MenuListener());
+		entreeList = new JList(entrees);
+		entreeList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		entreeList.addListSelectionListener(new ListListener());
 		
-		fileMenu.add(account);
-		fileMenu.add(logout);
-		fileMenu.add(exit);
-			
-		customerMenu.add(fileMenu);
-	
-		setJMenuBar(customerMenu);
-	}
-	
-	private void DriverMenu() { // Menu bar for Driver 
-		driverMenu = new JMenuBar();
-     	
-		// File Menu
-		JMenu fileMenu = new JMenu("Driver");
+		sideList = new JList(sides);
+		sideList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		sideList.addListSelectionListener(new ListListener());
 		
-		account = new JMenuItem("Account");
-		account.addActionListener(new MenuListener());
+		drinkList = new JList(drinks);
+		drinkList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		drinkList.addListSelectionListener(new ListListener());
 		
-		fileMenu.add(account);
-		fileMenu.add(logout);
-		fileMenu.add(exit);
-			
-		driverMenu.add(fileMenu);
-	
-		setJMenuBar(driverMenu);
-	}
-	
-	private void RestaurantMenu() { // Menu bar for Restaurant 
-		restaurantMenu = new JMenuBar();
-     	
-		// File Menu
-		JMenu fileMenu = new JMenu("Restaurant");
+		JPanel entreesPanel = new JPanel();
+		JPanel sidesPanel = new JPanel();
+		JPanel drinksPanel = new JPanel();
 		
-		account = new JMenuItem("Account");
-		account.addActionListener(new MenuListener());
+		JScrollPane entreeScroll =  new JScrollPane(entreeList);
+		JScrollPane sideScroll =  new JScrollPane(sideList);
+		JScrollPane drinkScroll =  new JScrollPane(drinkList);
 		
-		fileMenu.add(account);
-		fileMenu.add(logout);
-		fileMenu.add(exit);
-			
-		restaurantMenu.add(fileMenu);
-	
-		setJMenuBar(restaurantMenu);
-	}
+		entreesPanel.add(entreeScroll);
+		sidesPanel.add(sideScroll);
+		drinksPanel.add(drinkScroll);
+		
+		entreesPanel.setBorder(BorderFactory.createTitledBorder("Entrees"));
+		sidesPanel.setBorder(BorderFactory.createTitledBorder("Sides"));
+		drinksPanel.setBorder(BorderFactory.createTitledBorder("Drinks"));
+		
+		add(entreesPanel,BorderLayout.NORTH);
+		add(sidesPanel,BorderLayout.CENTER);
+		add(drinksPanel,BorderLayout.SOUTH);
+		*/
+		if(person == 1) {
+			buttons.add(create);
+		}
+		else if(person == 3) {
+			buttons.add(addItem);
+		}
+		
+		buttons.add(back);
+		add(buttons,BorderLayout.SOUTH);
 
+		setVisible(true);
+	}
+	
+	private void Order() {	// Order Window
+		Frame = 9;
+		done.setText("Order");
+	
+		buttons.add(done);
+	}
 	
 	// Simple Methods
+	private void Menu() { // Menu bar
+		Menu = new JMenuBar();
+		
+		// File Menu
+		JMenu fileMenu = new JMenu("Menu");
+		
+		if((Frame == 4) || (Frame == 5) || (Frame == 6)) {
+			if(person == 1) {
+				fileMenu.setText("Customer");
+			}
+			else if(person == 2) {
+				fileMenu.setText("Driver");
+			}
+			else if(person == 3) {
+				fileMenu.setText("Resturant");
+			}
+			
+			account = new JMenuItem("Account");
+			account.addActionListener(new MenuListener());
+			
+			fileMenu.add(account);
+		}
+
+		logout = new JMenuItem("Logout");
+		logout.addActionListener(new MenuListener());
+		
+		exit = new JMenuItem("Exit");
+		exit.addActionListener(new MenuListener());
+
+		fileMenu.add(logout);
+		fileMenu.add(exit);
+					
+		Menu.add(fileMenu);
+		setJMenuBar(Menu);
+	}
+	
+	private void ClearFrame() { // Clears Window 
+		getContentPane().removeAll();
+		getContentPane().revalidate();
+		getContentPane().repaint();
+	}
+	
+	private void ClearPanel(JPanel panel) { // Clears Panel 
+		panel.removeAll();
+		panel.validate();
+	}
+	
 	private void removeFrameItem(JComponent component) { // Removes Single Item From Frame 
 		remove(component);
 		revalidate();
 		repaint();
 	}
 
-	private void removePanelItem(JPanel panel, JComponent component) { // Removes Single Item From Panel 
-		panel.remove(component);
-		panel.revalidate();
-		panel.repaint();
-	}
-	
 	private boolean CheckFrame() { // Checks that All Fields Are Filled 
 		boolean good = false;
 		
@@ -505,6 +569,15 @@ public class MainMenuGUI extends JFrame {
 			else if((person == 3) && friday.getText().isEmpty()) { missingField = "Friday";}
 			else if((person == 3) && saturday.getText().isEmpty()) { missingField = "Saturday";}
 			else if((person == 3) && sunday.getText().isEmpty()) { missingField = "Sunday";}
+			
+			else { good = true;}
+		}
+		else if(Frame == 7) {
+			if(itemName.getText().isEmpty()) {missingField = "Item Name";}
+			else if(itemType.getText().isEmpty()) {missingField = "Item Type";}
+			else if(itemDescription.getText().isEmpty()) {missingField = "Description";}
+			else if(itemPrep.getText().isEmpty()) {missingField = "Item Prep Time";}
+			else if(itemPrice.getText().isEmpty()) {missingField = "Item Price";}	
 			
 			else { good = true;}
 		}
@@ -542,60 +615,59 @@ public class MainMenuGUI extends JFrame {
 			}
 		}
 		
-		if(Frame == 7) {
-			if(itemName.getText().isEmpty()) {missingField = "Item Name";}
-			else if(itemType.getText().isEmpty()) {missingField = "Item Type";}
-			else if(itemDescription.getText().isEmpty()) {missingField = "Description";}
-			else if(itemPrep.getText().isEmpty()) {missingField = "Item Prep Time";}
-			else if(itemPrice.getText().isEmpty()) {missingField = "Item Price";}
-			
-		}
-		
 		return good;
 	}
 
 	private void setGetInfo() { // Sets GetInfo Panel 
 
-		if(person == 1) {
-			setSize(500,300);
+		if(Frame == 0) {
+			getInfo.add(new JLabel("Email:"));
+			getInfo.add(email, BorderLayout.CENTER);
+			getInfo.add(new JLabel("Password:"));
+			getInfo.add(password, BorderLayout.CENTER);	
 		}
-
-		getInfo.removeAll();
-		getInfo.validate();
-		
-		getInfo.add(new JLabel(""));
-		getInfo.add(new JLabel(""));
-		
-		getInfo.setLayout(new GridLayout(7,0));
-		
-		getInfo.add(new JLabel("Name:"));
-		getInfo.add(name, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Address:"));
-		getInfo.add(address, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Email:"));
-		getInfo.add(email, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Password:"));
-		getInfo.add(password, BorderLayout.CENTER);
-		getInfo.add(new JLabel("Phone Number:"));
-		getInfo.add(phoneNumber, BorderLayout.CENTER);
-		
-		if(person == 2) {
-			setSize(500,300);
+		else {
+			if(person == 1) {
+				setSize(500,300);
+			}
+	
+			getInfo.removeAll();
+			getInfo.validate();
+			
+			getInfo.add(new JLabel(""));
+			getInfo.add(new JLabel(""));
 			
 			getInfo.setLayout(new GridLayout(7,0));
 			
-			getInfo.add(new JLabel("Vehicle:"));
-			getInfo.add(vehicle);
-		}
-		
-		getInfo.setBorder(BorderFactory.createTitledBorder("Information"));
-		add(getInfo, BorderLayout.CENTER);
-		
-		if(person == 3) {
-			setSize(500,510);
+			getInfo.add(new JLabel("Name:"));
+			getInfo.add(name, BorderLayout.CENTER);
+			getInfo.add(new JLabel("Address:"));
+			getInfo.add(address, BorderLayout.CENTER);
+			getInfo.add(new JLabel("Email:"));
+			getInfo.add(email, BorderLayout.CENTER);
+			getInfo.add(new JLabel("Password:"));
+			getInfo.add(password, BorderLayout.CENTER);
+			getInfo.add(new JLabel("Phone Number:"));
+			getInfo.add(phoneNumber, BorderLayout.CENTER);
 			
-			CreateHours();
-			add(hours);
+			if(person == 2) {
+				setSize(500,300);
+				
+				getInfo.setLayout(new GridLayout(7,0));
+				
+				getInfo.add(new JLabel("Vehicle:"));
+				getInfo.add(vehicle);
+			}
+			
+			getInfo.setBorder(BorderFactory.createTitledBorder("Information"));
+			add(getInfo, BorderLayout.CENTER);
+			
+			if(person == 3) {
+				setSize(500,510);
+				
+				CreateHours();
+				add(hours);
+			}
 		}
 	}
 	
@@ -634,7 +706,7 @@ public class MainMenuGUI extends JFrame {
 		restaurantHours.add(saturday.getText());
 		restaurantHours.add(sunday.getText());	
 	}
-	
+
 	private void setExistingInfo() { // Sets Fields For Existing Info 
 		
 		if(person == 1) {
@@ -669,28 +741,15 @@ public class MainMenuGUI extends JFrame {
 			sunday.setText(restaurantUser.getHours().get(6));
 		}
 	}
-	
+
 	// Classes
- 	private class TimerListener implements ActionListener{ // Initial Screen Timer 
+	private class TimerListener implements ActionListener{ // Initial Screen Timer 
 
 		public void actionPerformed(ActionEvent e) {
 			timer.stop();
 			removeFrameItem(title);
-			
-			// Menu
-			menu = new JMenuBar();
-			JMenu fileMenu = new JMenu("File");
-			
-			logout = new JMenuItem("Logout");
-			logout.addActionListener(new MenuListener());
-			
-			exit = new JMenuItem("Exit");
-			exit.addActionListener(new MenuListener());
-
-			fileMenu.add(exit);
-			menu.add(fileMenu);
-			
-			setJMenuBar(menu);
+				
+			Menu();
 			
 			LogingIn();
 		}
@@ -713,189 +772,23 @@ public class MainMenuGUI extends JFrame {
 		
 	}
 
-	private class LogButtonListener implements ActionListener { //Log In Buttons 
-		
-		public void actionPerformed(ActionEvent e) {
-			JButton source = (JButton)(e.getSource());
-			
-			if(person == 0) {
-				JOptionPane.showMessageDialog(null,"Please select person type "
-						+ "(i.e. Customer, Driver, restaurant).", "Log In", JOptionPane.PLAIN_MESSAGE);
-			}
-			else if(!CheckFrame() && !source.equals(signUp)) {
-				JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
-						"Missing Info", JOptionPane.PLAIN_MESSAGE);
-			}
-			else if(!mainMenu.CheckExists(person, email.getText().trim(), password.getText().trim()) && source.equals(logIn)) {
-				JOptionPane.showMessageDialog(null,"No account exists with the provided information"
-						, "Log In", JOptionPane.PLAIN_MESSAGE);
-			}
-			else {
-				removeFrameItem(menu);
-				removeFrameItem(message);
-				removeFrameItem(getInfo);
-				removeFrameItem(personType);
-				removeFrameItem(buttons);
-					
-				removePanelItem(buttons, logIn);
-				removePanelItem(buttons, signUp);
-				
-				if(source.equals(logIn)) {
-					if(person == 1) {
-						customerUser = new Customer(mainMenu.getCustomer(email.getText(), password.getText()));
-						setExistingInfo();
-						
-						Customer();
-					}
-					else if(person == 2) {
-						driverUser = new Driver(mainMenu.getDriver(email.getText(), password.getText()));
-						setExistingInfo();
-						
-						Driver();
-					}
-					else if(person == 3) {
-						restaurantUser = new Restaurant(mainMenu.getRestaurant(email.getText(), password.getText()));
-						setExistingInfo();
-						
-						Restaurant();
-					}
-				}
-				else if(source.equals(signUp)) {
-					SignUp();
-				}
-			}
-		}
-	}
-
-	private class SignButtonListener implements ActionListener{ // Signing Up Buttons 
-		public void actionPerformed(ActionEvent e) {
-			JButton source = (JButton)(e.getSource());
-			
-			if(!CheckFrame() && !source.equals(back)) {
-				JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
-						"Missing Info", JOptionPane.PLAIN_MESSAGE);
-			}
-			else if(mainMenu.CheckExists(person, email.getText().trim()) && source.equals(done)) {
-				JOptionPane.showMessageDialog(null,"An account aleady exists for this email."
-						, "Log In", JOptionPane.PLAIN_MESSAGE);
-			}
-			else {
-				removeFrameItem(message);
-				removeFrameItem(getInfo);
-				removeFrameItem(buttons);
-						
-				removePanelItem(buttons, done);
-				removePanelItem(buttons, back);
-				
-				if(person == 3) {
-					removeFrameItem(hours);
-				}
-	
-				if(source.equals(done)) {
-					if(person == 1) {
-						customerUser = new Customer(name.getText(), address.getText(), email.getText(),
-								password.getText(), phoneNumber.getText());
-						mainMenu.customers.add(customerUser);
-						Customer();
-					}
-					else if(person == 2) {
-						driverUser = new Driver(name.getText(), address.getText(), email.getText(),
-								password.getText(), phoneNumber.getText(), vehicle.getText());
-						mainMenu.drivers.add(driverUser);
-						Driver();
-					}
-					else if(person == 3) {
-						int ok;
-						
-						setHours();
-						
-						restaurantUser = new Restaurant(name.getText(), address.getText(), email.getText(),
-								password.getText(), phoneNumber.getText(), restaurantHours);
-						mainMenu.restaurants.add(restaurantUser);
-						
-						ok = JOptionPane.showConfirmDialog(null, "Would you like to add items to your menu?", 
-								"Add To Menu", JOptionPane.YES_NO_OPTION);
-						
-						if(ok == JOptionPane.OK_OPTION) {
-							
-							AddToMenu();
-						}
-						else {
-							Restaurant();
-						}	
-					}
-					
-					MainMenu.saveData(mainMenu);
-				}
-				else if(source.equals(back)) {
-					person = 0;
-					email.setText("");
-					password.setText("");
-					LogingIn();
-				}
-			}
-		}	
-	}
-	
-	private class AccountButtonListener implements ActionListener{ // Account Buttons 
-		public void actionPerformed(ActionEvent e) {
-			JButton source = (JButton)(e.getSource());
-			
-			if(!CheckFrame() && source.equals(done)) {
-				JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
-						"Missing Info", JOptionPane.PLAIN_MESSAGE);
-			}
-			else {
-				if(source.equals(edit)) {
-					Frame = 3;
-					
-					setTextFields();
-					Account();
-				}
-				else if(source.equals(done)) {
-					Frame = 2;
-					setTextFields();
-					
-					MainMenu.saveData(mainMenu);
-					
-					Account();
-				}
-				else if(source.equals(back)) {
-					if(Frame == 2) {
-						removeFrameItem(getInfo);
-						removeFrameItem(buttons);
-		
-						if(person == 1) {
-							Customer();
-						}
-						else if(person == 2) {
-							Driver();
-						}
-						else if(person == 3) {
-							removeFrameItem(hours);
-							
-							Restaurant();
-						}
-					}
-				}
-			}
-		}
-	}
-
 	private class MenuListener implements ActionListener { // Menus 
 		
 		public void actionPerformed(ActionEvent e) {
 			JMenuItem source = (JMenuItem)(e.getSource());
 			
-			removeFrameItem(title);
+			ClearFrame();
 			
 			if(source.equals(account)) {
 				Frame = 2;
-				setJMenuBar(menu);
+				Menu();
 				setTextFields();
 				Account();
 			}
 			else if(source.equals(logout)) {
+				ClearPanel(buttons);
+				email.setText("");
+				password.setText("");
 				LogingIn();
 			}
 			else if(source.equals(exit)) {
@@ -904,48 +797,253 @@ public class MainMenuGUI extends JFrame {
 			}
 		}
 	}
-
-	private class MenuButtonListener implements ActionListener { // Adding Item to Menu 
 		
+	private class ListListener implements ListSelectionListener {	// List Selection
+		
+		public void valueChanged(ListSelectionEvent e) {
+			
+		}
+		
+	}
+	
+	private class MenuButtonListener implements ActionListener { // Buttons
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton)(e.getSource());
 			
-			if(!CheckFrame() && source.equals(done)) {
-				if(missingField.equals("Description")) {
-					int ok = JOptionPane.showConfirmDialog(null, "Are you sure you would not like to add a desciption?", 
-							"Add Item", JOptionPane.YES_NO_OPTION);
+			if(Frame == 0) {	//	Log In Window
+				if(person == 0) {
+					JOptionPane.showMessageDialog(null,"Please select person type "
+							+ "(i.e. Customer, Driver, restaurant).", "Log In", JOptionPane.PLAIN_MESSAGE);
+				}
+				else if(!CheckFrame() && !source.equals(signUp)) {
+					JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
+							"Missing Info", JOptionPane.PLAIN_MESSAGE);
+				}
+				else if(!mainMenu.CheckExists(person, email.getText().trim(), password.getText().trim()) && source.equals(logIn)) {
+					JOptionPane.showMessageDialog(null,"No account exists with the provided information"
+							, "Log In", JOptionPane.PLAIN_MESSAGE);
+				}
+				else {
+					ClearFrame();
+					ClearPanel(buttons);
+	
+					if(source.equals(logIn)) {
+						if(person == 1) {
+							customerUser = new Customer(mainMenu.getCustomer(email.getText(), password.getText()));
+							setExistingInfo();
+							
+							Customer();
+						}
+						else if(person == 2) {
+							driverUser = new Driver(mainMenu.getDriver(email.getText(), password.getText()));
+							setExistingInfo();
+							
+							Driver();
+						}
+						else if(person == 3) {
+							restaurantUser = new Restaurant(mainMenu.getRestaurant(email.getText(), password.getText()));
+							setExistingInfo();
+							
+							Restaurant();
+						}
+					}
+					else if(source.equals(signUp)) {
+						SignUp();
+					}
+				}
+			}
+			else if(Frame == 1) {	// Sign up Window
+				if(!CheckFrame() && !source.equals(back)) {
+					JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
+							"Missing Info", JOptionPane.PLAIN_MESSAGE);
+				}
+				else if(mainMenu.CheckExists(person, email.getText().trim()) && source.equals(done)) {
+					JOptionPane.showMessageDialog(null,"An account aleady exists for this email."
+							, "Log In", JOptionPane.PLAIN_MESSAGE);
+				}
+				else {
+					ClearFrame();
+					ClearPanel(buttons);
 					
-					if(ok == JOptionPane.OK_OPTION) {
-						removeFrameItem(message);
-						removeFrameItem(itemAdd);
-						removeFrameItem(buttons);
+					if(person == 3) {
+						removeFrameItem(hours);
+					}
+		
+					if(source.equals(done)) {
+						if(person == 1) {
+							customerUser = new Customer(name.getText(), address.getText(), email.getText(),
+									password.getText(), phoneNumber.getText());
+							mainMenu.customers.add(customerUser);
+							Customer();
+						}
+						else if(person == 2) {
+							driverUser = new Driver(name.getText(), address.getText(), email.getText(),
+									password.getText(), phoneNumber.getText(), vehicle.getText());
+							mainMenu.drivers.add(driverUser);
+							Driver();
+						}
+						else if(person == 3) {
+							int ok;
+							
+							setHours();
+							
+							restaurantUser = new Restaurant(name.getText(), address.getText(), email.getText(),
+									password.getText(), phoneNumber.getText(), restaurantHours);
+							mainMenu.restaurants.add(restaurantUser);
+							
+							ok = JOptionPane.showConfirmDialog(null, "Would you like to add items to your menu?", 
+									"Add To Menu", JOptionPane.YES_NO_OPTION);
+							
+							if(ok == JOptionPane.OK_OPTION) {
 								
-						removePanelItem(buttons, done);
-						removePanelItem(buttons, back);
+								AddToMenu();
+							}
+							else {
+								Restaurant();
+							}	
+						}
+						
+						MainMenu.saveData(mainMenu);
+					}
+					else if(source.equals(back)) {
+						person = 0;
+						email.setText("");
+						password.setText("");
+						LogingIn();
+					}
+				}
+			}
+			else if(Frame == 2) {	//	Account Window
+				if(!CheckFrame() && source.equals(done)) {
+					JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
+							"Missing Info", JOptionPane.PLAIN_MESSAGE);
+				}
+				else {
+					if(source.equals(edit)) {
+						Frame = 3;
+						
+						setTextFields();
+						Account();
+					}
+					else if(source.equals(done)) {
+						Frame = 2;
+						setTextFields();
+						
+						MainMenu.saveData(mainMenu);
+						
+						Account();
+					}
+					else if(source.equals(back)) {
+						if(Frame == 2) {
+							ClearFrame();
+			
+							if(person == 1) {
+								Customer();
+							}
+							else if(person == 2) {
+								Driver();
+							}
+							else if(person == 3) {
+								Restaurant();
+							}
+						}
+					}
+				}
+			}
+			else if(Frame == 4) {	//	Customer Menu
+				ClearFrame();
+				ClearPanel(buttons);
+				
+				if(source.equals(viewRestaurant)) {
+					RestaurantList();
+				}
+			}
+			else if(Frame == 6) {	// Restaurant Menu
+				ClearFrame();
+				ClearPanel(buttons);
+				
+				if(source.equals(toMenu)) {
+					RestaurantFoodMenu();
+				}
+			}
+			else if(Frame == 7) {	//	Item Add Window
+				if(!CheckFrame() && source.equals(done)) {
+					if(missingField.equals("Description")) {
+						int ok = JOptionPane.showConfirmDialog(null, "Are you sure you would not like to add a desciption?", 
+								"Add Item", JOptionPane.YES_NO_OPTION);
+						
+						if(ok == JOptionPane.OK_OPTION) {
+							ClearFrame();
+							ClearPanel(buttons);
+							
+							newItem = new Item(itemName.getText(), itemType.getText(), itemDescription.getText(), 
+									Integer.parseInt(itemPrep.getText()), Double.parseDouble(itemPrice.getText()));
+							restaurantUser.addItem(newItem);
+							
+							RestaurantFoodMenu();
+						}
+						
+					}
+					else {
+					JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
+							"Missing Info", JOptionPane.PLAIN_MESSAGE);
+					}
+				}
+				else {
+					ClearFrame();
+					ClearPanel(buttons);
+					
+					if(source.equals(done)) {
+						
+						newItem = new Item(itemName.getText(), itemType.getText(), itemDescription.getText(), 
+								Integer.parseInt(itemPrep.getText()), Double.parseDouble(itemPrice.getText()));
+						restaurantUser.addItem(newItem);
 						
 						RestaurantFoodMenu();
 					}
-					
-				}
-				else {
-				JOptionPane.showMessageDialog(null,"Please enter information for " + missingField, 
-						"Missing Info", JOptionPane.PLAIN_MESSAGE);
+					else if(source.equals(back)) {
+						RestaurantFoodMenu();
+					}
 				}
 			}
-			else {
-				removeFrameItem(message);
-				removeFrameItem(itemAdd);
-				removeFrameItem(buttons);
-						
-				removePanelItem(buttons, done);
-				removePanelItem(buttons, back);
+			else if(Frame == 8) {	//	Restaurant Menu Window
+				ClearFrame();
+				ClearPanel(buttons);
 				
-				if(source.equals(done)) {
-					
-					RestaurantFoodMenu();
+				if(source.equals(create)) {
+					Order();
+				}
+				else if(source.equals(addItem)) {
+					AddToMenu();
 				}
 				else if(source.equals(back)) {
-					RestaurantFoodMenu();
+					if(person == 1) {
+						Customer();
+					}
+					else if(person == 3) {
+						Restaurant();
+					}
+				}
+			}
+			else if(Frame == 9) {
+				ClearFrame();
+				ClearPanel(buttons);
+				done.setText("Done");
+				
+				if(source.equals(create)) {
+					done.setText("Order");
+					Order();
+				}
+				else if(source.equals(addItem)) {
+					AddToMenu();
+				}
+				else if(source.equals(back)) {
+					if(person == 1) {
+						Customer();
+					}
+					else if(person == 3) {
+						Restaurant();
+					}
 				}
 			}
 		}

@@ -25,6 +25,16 @@ public class Item implements Serializable{
 		price = item.getPrice();
 	}
 	
+	public Item(String name, String type, 
+			String description, int prepTime, double price) {
+		
+		this.name = name.trim();
+		this.type = type.trim();
+		this.description = description.trim();
+		this.prepTime = prepTime;
+		this.price = price;
+	}
+	
 	public void setName(String aName) {name = aName;};
 	public String getName() {return name;};
 	
