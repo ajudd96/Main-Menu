@@ -144,11 +144,12 @@ public void printCompleteOrder() {                         // New
 
 public void printDriverOrderList() {                     // New
 	System.out.printf("Customer: %s\n", customer.getName());
-	System.out.printf("Restaurant: %s\n", restaurant.getName());
+	System.out.printf("Restaurant: %s\n\n", restaurant.getName());
 }
 
 public void printRestaurantOrderList() {                // New
 	System.out.printf("Customer: %s\n", customer.getName());
+	System.out.printf("Items:\n");
 	for (int i=0; i < items.size(); i++) {
 		System.out.printf("%s\n", items.get(i).getName());
 	}
