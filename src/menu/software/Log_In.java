@@ -1,6 +1,7 @@
 package menu.software;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Log_In implements Serializable{
 
@@ -10,6 +11,7 @@ public class Log_In implements Serializable{
 	protected String email;
 	protected String password;
 	protected String phoneNumber;
+	protected ArrayList<Order> orders;
 	
 	// Constructor
 	public Log_In() {
@@ -18,6 +20,8 @@ public class Log_In implements Serializable{
 		this.email = "unknown";
 		this.password = "unknown";
 		this.phoneNumber = "unknown";
+		
+		this.orders = new ArrayList<Order>();
 	}
 	
 	// Setters/Getters
@@ -31,6 +35,10 @@ public class Log_In implements Serializable{
 	public String getPassword() {return password;}
 	public void setNumber(String number) {this.phoneNumber = number;}
 	public String getNumber() {return phoneNumber;}
+	
+	public void addOrder(Order order) {this.orders.add(order);}
+	public void removeOrder(Order order) {this.orders.remove(order);}
+	public ArrayList<Order> getOrders() {return orders;}
 	
 	// Methods
 	public boolean Verify(String email, String password) {
@@ -52,4 +60,5 @@ public class Log_In implements Serializable{
 		
 		return good;
 	}
+
 }

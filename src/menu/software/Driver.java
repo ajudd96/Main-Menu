@@ -1,5 +1,7 @@
 package menu.software;
 
+import java.util.ArrayList;
+
 public class Driver extends Log_In{
 	
 	//Fields
@@ -36,5 +38,13 @@ public class Driver extends Log_In{
 	public String getVehicle() {return vehicle;}
 	
 	// Methods
-
+	public ArrayList<String> getOrderList() {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		for(Order order : this.getOrders()) {
+			list.add(order.DriverOrderList());
+		}
+		
+		return list;
+	}
 }

@@ -96,6 +96,36 @@ public class MainMenu implements Serializable {
 		return false;
 	}
 
+	public int getIndex(int personType, String email, String password) {
+		int index = 0;
+		
+		if(personType == 1) {
+			for(Customer customer: customers) {
+				if(customer.Verify(email, password)) {
+					return index;
+				}
+			}
+			index++;
+		}
+		else if(personType == 2) {
+			for(Driver driver: drivers) {
+				if(driver.Verify(email, password)) {
+					return index;
+				}
+			}	
+			index++;
+		}
+		else if(personType == 3) {
+			for(Restaurant restaurant: restaurants) {
+				if(restaurant.Verify(email, password)) {
+					return index;
+				}
+			}	
+			index++;
+		}
+		return -1;
+	}
+	
 	public Customer getCustomer(String email, String password) {
 		for(Customer customer: customers) {
 			if(customer.Verify(email, password)) {
@@ -122,6 +152,7 @@ public class MainMenu implements Serializable {
 		}	
 		return null;
 	}
+
 	
 	public static void saveData(MainMenu menu) {
 		
@@ -167,4 +198,79 @@ public class MainMenu implements Serializable {
 		}  
 		return menu;
 	}
+
+	public void viewRestaurantList() {
+		System.out.println("A list of Restaurants are as follows:\n");
+		for(Restaurant aRestaurant: restaurants) {
+			System.out.println(aRestaurant.getName() + "\n");
+		}
+	}
+	
+	public ArrayList<String> RestaurantList() {
+		ArrayList<String> locations = new ArrayList<String>();
+		
+		for(Restaurant aRestaurant: restaurants) {
+			locations.add(' ' + aRestaurant.getName());
+		}
+		return locations;
+	}
+
+	public boolean CheckItemExists(Item food, Restaurant restaurant) {
+		boolean good = false;
+		
+		for(Item item : restaurant.getMenu().getEntrees()) {
+			if((item.getName().equals(food.getName())) 
+				&& (item.getType().equals(food.getType())) 
+				&& (item.getDescription().equals(food.getDescription()))
+				&& (item.getPrepTime() == food.getPrepTime())
+				&& (item.getPrice() == food.getPrice())) 
+				{return true;}
+		}
+		for(Item item : restaurant.getMenu().getSides()) {
+			if((item.getName().equals(food.getName())) 
+					&& (item.getType().equals(food.getType())) 
+					&& (item.getDescription().equals(food.getDescription()))
+					&& (item.getPrepTime() == food.getPrepTime())
+					&& (item.getPrice() == food.getPrice())) 
+					{return true;}
+		}
+		for(Item item : restaurant.getMenu().getDrinks()) {
+			if((item.getName().equals(food.getName())) 
+					&& (item.getType().equals(food.getType())) 
+					&& (item.getDescription().equals(food.getDescription()))
+					&& (item.getPrepTime() == food.getPrepTime())
+					&& (item.getPrice() == food.getPrice())) 
+					{return true;}
+		}
+		
+		return good;
+	}
+	
+	public int getOrderExists(Order order, Customer customer) {
+		int index = 0;
+			
+		for(Order things : customer.getOrders()) {
+			if((things.getCost() == order.getCost()) &&
+					(things.getTotalTime() == order.getTotalTime()) &&
+					(things.getPrepTime() == order.getPrepTime()) &&
+					(things.getRestaurant().getEmail().equals(order.getRestaurant().getEmail())) &&
+					(things.getItems().containsAll(order.getItems())) &&
+					(things.getComment().equals(order.getComment())) &&
+					(things.getComment().equals(order.getComment()))) {
+				
+				if(things.getPayment().getType().equals(order.getPayment().getType())) {
+					// Does not account for different Payment
+					if(things.getPayment().getCreditCardLastFourNumber() == order.getPayment().getCreditCardLastFourNumber() ||
+							things.getPayment().getPayPalEmail().equals(order.getPayment().getPayPalEmail())) {
+						return index;
+					}
+				}
+				index++;
+			}
+			
+		}
+		
+		return -1;
+	}
+
 }

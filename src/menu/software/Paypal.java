@@ -8,6 +8,18 @@ public class Paypal extends Payment{
 		email ="";
 	}
 	
+	public Paypal(String email) {
+		setType("Paypal");
+		this.email = email.trim();
+		setPayPalEmail(email.trim());
+	}
+	
+	public Paypal(Paypal paypal) {
+		setType("Paypal");
+		this.email = paypal.getEmail();
+		setPayPalEmail(paypal.getEmail());
+	}
+	
 	public String getEmail() {
 		return email;
 	}

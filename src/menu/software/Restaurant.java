@@ -24,6 +24,7 @@ public class Restaurant extends Log_In{
 		this.phoneNumber = phoneNumber.trim();
 		this.hours = new ArrayList<String>(hours);
 		
+		this.menu = new Menu();
 	}
 
 	public Restaurant(Restaurant restaurant) {
@@ -34,6 +35,8 @@ public class Restaurant extends Log_In{
 		this.password = restaurant.getPassword();
 		this.phoneNumber = restaurant.getNumber();
 		this.hours = new ArrayList<String>(restaurant.getHours());
+		
+		this.menu = new Menu(restaurant.getMenu());
 	}
 	
 	// Getters/Setters
@@ -68,5 +71,13 @@ public class Restaurant extends Log_In{
 		return null;
 	}
 	
-	
+	public ArrayList<String> getOrderList() {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		for(Order order : this.getOrders()) {
+			list.add(order.RestaurantOrderList());
+		}
+		
+		return list;
+	}
 }

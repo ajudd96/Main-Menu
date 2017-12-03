@@ -6,9 +6,9 @@ import menu.software.*;
 public class GUIDriver {
 	
 	public static void main(String[] args) {
-		/**/
-		MainMenu menu = new MainMenu();
-
+		/*
+		MainMenu mainMenu = new MainMenu();
+		
 		//-------- Create Customer -----------//
 		Customer cust1 = new Customer();
 		
@@ -24,14 +24,14 @@ public class GUIDriver {
 		c1.setExpireDate("April 1 2020");	
 		c1.setNumber("1234 5678 9101 1232");
 		c1.setName("Frank Doe");
-		cust1.addPayment(c1);
+		cust1.addCard(c1);
 		
 		// PayPal
 		Paypal pp1 = new Paypal();
 		pp1.setEmail("doeFrank@email.com");
-		cust1.addPayment(pp1);
+		cust1.addPaypal(pp1);
 		
-		menu.addCustomer(cust1);
+		mainMenu.addCustomer(cust1);
 		
 		//-------- Create Driver -----------//
 		Driver driv1 = new Driver();
@@ -43,7 +43,7 @@ public class GUIDriver {
 		driv1.setPassword("Driver1");
 		driv1.setVehicle("Chevrolet Equinox");
 		
-		menu.addDriver(driv1);
+		mainMenu.addDriver(driv1);
 		
 		//-------- Create Restaurant -----------//
 		Restaurant rest1 = new Restaurant();
@@ -91,13 +91,14 @@ public class GUIDriver {
 		rest1.addItem(item2);
 		rest1.addItem(item3);
 
-		menu.addRestaurant(rest1);
+		mainMenu.addRestaurant(rest1);
 		
 		// -------- Main Menu -----------//
 		
-		MainMenu.saveData(menu);
-		
+		MainMenu.saveData(mainMenu);
+		/**/
 		// Create GUI
 		MainMenuGUI newGUI = new MainMenuGUI();     
 	}
+	
 }

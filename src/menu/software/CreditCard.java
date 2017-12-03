@@ -14,6 +14,24 @@ public class CreditCard extends Payment{
 		name= "";
 	}
 	
+	public CreditCard(String number, String CVV, String date, String name) {
+		setType("Credit Card");
+		this.number = number.trim();
+		this.CVV = CVV.trim();
+		this.expireDate = date.trim();
+		this.name= name.trim();
+		//setCreditCardLastFourNumber(Integer.parseInt(number) % 10000);	// convert string to int first, and then calculates the last 4 digits
+	}
+	
+	public CreditCard(CreditCard card) {
+		setType("Credit Card");
+		this.number = card.getNumber();
+		this.CVV = card.getCVV();
+		this.expireDate = card.getExpireDate();
+		this.name= card.getName();
+		//setCreditCardLastFourNumber(Integer.parseInt(number) % 10000);	// convert string to int first, and then calculates the last 4 digits
+	}
+
 	public String getNumber() {
 		return number;
 	}
@@ -45,4 +63,5 @@ public class CreditCard extends Payment{
 	public void setName(String aName) {
 		name = aName;
 	}
+	
 }

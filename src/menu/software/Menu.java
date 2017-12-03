@@ -1,6 +1,7 @@
 package menu.software;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Menu implements Serializable{
@@ -9,7 +10,8 @@ public class Menu implements Serializable{
 	private ArrayList<Item> entrees;
 	private ArrayList<Item> sides;
 	private ArrayList<Item> drinks;
-		
+	private static final DecimalFormat dformat = new DecimalFormat("#.00");
+	
 	// Constructors
 	public Menu() {
 		this.entrees = new ArrayList<Item>();
@@ -60,7 +62,7 @@ public class Menu implements Serializable{
 		ArrayList<String> entreeList = new ArrayList<String>();
 		
 		for (Item item: entrees) {
-			entreeList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+			entreeList.add(item.getName() + "				" + dformat.format(item.getPrice()) + '\n' + item.getDescription() + '\n') ;
 		}
 		
 		return entreeList;
@@ -70,7 +72,7 @@ public class Menu implements Serializable{
 		ArrayList<String> sideList = new ArrayList<String>();
 		
 		for (Item item: sides) {
-			sideList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+			sideList.add(item.getName() + "				" + dformat.format(item.getPrice()) + '\n' + item.getDescription() + '\n');
 		}
 		
 		return sideList;
@@ -80,7 +82,7 @@ public class Menu implements Serializable{
 		ArrayList<String> drinkList = new ArrayList<String>();
 		
 		for (Item item: drinks) {
-			drinkList.add("%s $%f.2 %s\n" + item.getName() + item.getPrice() + item.getDescription());
+			drinkList.add(item.getName() + "				" + dformat.format(item.getPrice()) + '\n' + item.getDescription() + '\n');
 		}
 		
 		return drinkList;
